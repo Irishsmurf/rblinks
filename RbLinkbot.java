@@ -18,14 +18,14 @@ public class RbLinkbot extends PircBot{
         }
 
         if (msg.equalsIgnoreCase("rblinks: where")){
-            sendMessage(chan, "https://api.mongolab.com/api/1/databases/redbricklinks/collections/links?apiKey=b-IUxITU2DZ6rn46uboWKdlfn3SpPHmG");
+            sendMessage(chan, "https://api.mongolab.com/api/1/databases/redbricklinks/collections/links?apiKey=8sF5VRmL3C2NGv8rnoFJn_fz6UOaQuVj");
         }
 
         String[] msgArr = msg.split(" ");
         Pattern p = Pattern.compile(REGEX);
         for(int i=0; i<msgArr.length; i++){
             Matcher msg_m = p.matcher(msgArr[i]);
-            if(msg_m.find()){
+            if(msg_m.find() && sender != "TinyURL"){
                 try{
                     addLink(msgArr[i].trim(), sender);
                 }catch(UnknownHostException e){
