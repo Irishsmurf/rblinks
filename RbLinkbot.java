@@ -48,7 +48,7 @@ public class RbLinkbot extends PircBot{
 
     public void addLink(String link, String nick) throws UnknownHostException{
         String time = new java.util.Date().toString();
-        String url = "mongodb://redbrick:rblinks_X@ds057877.mongolab.com:57877/redbricklinks";
+        String url = "mongodb://XXXXXXXXXXX";
         MongoClientURI uri = new MongoClientURI(url);
         MongoClient client = new MongoClient(uri);
         DB db = client.getDB(uri.getDatabase());
