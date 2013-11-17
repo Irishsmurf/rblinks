@@ -30,8 +30,9 @@ public class RbLinkbot extends PircBot{
         if(containsReg(msg)){
             String[] msgArr = msg.split(" ");
             for(int i=0; i<msgArr.length; i++){
-                if(containsReg(msgArr[i]) && sender != "TinyURL"){
+                if((containsReg(msgArr[i])) && (sender != "TinyURL")){
                     try{
+                        System.out.println("Sender: "+sender+" - " +msgArr[i]);
                         addLink(msgArr[i].trim(), sender);
                     }catch(UnknownHostException e){
                         e.printStackTrace();
@@ -54,7 +55,7 @@ public class RbLinkbot extends PircBot{
 
     public void addLink(String link, String nick) throws UnknownHostException{
         String time = new java.util.Date().toString();
-        String url = "mongodb://XXXXXXXXXXXXXX";
+        String url = "mongodb://XXXXXXXXXX";
         MongoClientURI uri = new MongoClientURI(url);
         MongoClient client = new MongoClient(uri);
         DB db = client.getDB(uri.getDatabase());
