@@ -9,33 +9,39 @@ public class RbLinkbot extends PircBot{
         this.setName("rblinks");
     }
     
-    public final String REGEX = "^((https?|ftp)://|(www|ftp)\\.)?[a-z0-9-]+(\\.[a-z0-9-]+)+([/?].*)?$";
+    public boolean containsReg(String mesg){
+        String REGEX = "^((https?|ftp)://|(www|ftp)\\.)?[a-z0-9-]+(\\.[a-z0-9-]+)+([/?].*)?$";
+        Pattern p = Pattern.compile(REGEX);
+        Matcher msg_m = p.matcher(mesg);
+        if(msg_m.find())    return true;
+        else    return false;
+    }
 
     public void onMessage(String chan, String sender,
                        String login, String hostname, String msg){
         if (msg.equalsIgnoreCase("rblinks: version")){
-            sendMessage(chan, Colors.RED + "Rb" + Colors.NORMAL + "Linkbot 1.0");
+            sendMessage(chan, Colors.RED + "Rb" + Colors.NORMAL + "Linkbot 1.1111111");
         }
 
         if (msg.equalsIgnoreCase("rblinks: where")){
             sendMessage(chan, "https://api.mongolab.com/api/1/databases/redbricklinks/collections/links?apiKey=8sF5VRmL3C2NGv8rnoFJn_fz6UOaQuVj");
         }
 
-        String[] msgArr = msg.split(" ");
-        Pattern p = Pattern.compile(REGEX);
-        for(int i=0; i<msgArr.length; i++){
-            Matcher msg_m = p.matcher(msgArr[i]);
-            if(msg_m.find() && sender != "TinyURL"){
-                try{
-                    addLink(msgArr[i].trim(), sender);
-                }catch(UnknownHostException e){
-                    e.printStackTrace();
+        if(containsReg(msg)){
+            String[] msgArr = msg.split(" ");
+            for(int i=0; i<msgArr.length; i++){
+                if(containsReg(msgArr[i]) && sender != "TinyURL"){
+                    try{
+                        addLink(msgArr[i].trim(), sender);
+                    }catch(UnknownHostException e){
+                        e.printStackTrace();
+                    }
                 }
             }
         }
     }
 
-   public BasicDBObject[] createLinkObj(String URL, String NICK, 
+    public BasicDBObject[] createLinkObj(String URL, String NICK, 
                             String DATETIME, int COUNT){
         BasicDBObject rblink = new BasicDBObject();
         rblink.put("url", URL);
@@ -48,7 +54,7 @@ public class RbLinkbot extends PircBot{
 
     public void addLink(String link, String nick) throws UnknownHostException{
         String time = new java.util.Date().toString();
-        String url = "mongodb://XXXXXXXXXXX";
+        String url = "mongodb://XXXXXXXXXXXXXX";
         MongoClientURI uri = new MongoClientURI(url);
         MongoClient client = new MongoClient(uri);
         DB db = client.getDB(uri.getDatabase());
