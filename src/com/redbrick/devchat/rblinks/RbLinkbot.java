@@ -1,3 +1,5 @@
+package com.redbrick.devchat.rblinks;
+
 import com.mongodb.*;
 import org.jibble.pircbot.*;
 import java.net.UnknownHostException;

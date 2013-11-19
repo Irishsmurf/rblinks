@@ -1,4 +1,4 @@
-import org.jibble.pircbot.*;
+package com.redbrick.devchat.rblinks;
 
 public class RbLinks{
     public static void main(String[] args) throws Exception{
