@@ -32,7 +32,7 @@ public class RbLinkbot extends PircBot{
         if(containsReg(msg)){
             String[] msgArr = msg.split(" ");
             for(int i=0; i<msgArr.length; i++){
-                if((containsReg(msgArr[i])) && (sender != "TinyURL")){
+                if((containsReg(msgArr[i])) && (!sender.equals("TinyURL"))){
                     try{
                         System.out.println("Sender: "+sender+" - " +msgArr[i]);
                         addLink(msgArr[i].trim(), sender);
@@ -62,12 +62,6 @@ public class RbLinkbot extends PircBot{
         MongoClient client = new MongoClient(uri);
         DB db = client.getDB(uri.getDatabase());
         DBCollection rblinks = db.getCollection("links");
-
-        /*
-        //maybe pull database to check if link has been before
-        BasicDBObject find = new BasicDBObject("links", new BasicDBObject("$gte",link));
-        DBCursor docs = rblinks.find(find);
-        */
 
         final BasicDBObject[] links = createLinkObj(link,nick,time,1);
         rblinks.insert(links);
