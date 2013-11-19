@@ -1,3 +1,13 @@
 #!/bin/bash
-javac -cp "./pircbot.jar:mongo-java-driver-2.11.2.jar:." RbLinks.java
-java -cp "./pircbot.jar:mongo-java-driver-2.11.2.jar:." RbLinks
+figlet "RbLinks - wafs"
+sleep 2
+PWD=$(pwd)
+CWD="${PWD%/*}";
+JAVASRC="../src/com/redbrick/devchat/rblinks/"
+JAVACP="../lib/pircbot.jar:../lib/mongo-java-driver-2.11.2.jar:."
+COMP="*.java"
+COMPILE="javac -d . -cp $JAVACP $JAVASRC$COMP -verbose"
+eval $COMPILE
+RUN="java -cp $JAVACP com.redbrick.devchat.rblinks.RbLinks"
+eval $RUN
+
