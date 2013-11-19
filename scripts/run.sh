@@ -1,8 +1,6 @@
 #!/bin/bash
 figlet "RbLinks - wafs"
 sleep 2
-PWD=$(pwd)
-CWD="${PWD%/*}";
 JAVASRC="../src/com/redbrick/devchat/rblinks/"
 JAVACP="../lib/pircbot.jar:../lib/mongo-java-driver-2.11.2.jar:."
 COMP="*.java"
