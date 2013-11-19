@@ -22,10 +22,10 @@ public class RbLinkbot extends PircBot{
     }
     
     private static String nullStringFix(String input) {
-    	  return input == null ? "" : input;
-	}
+        return input == null ? "" : input;
+    }
 
-    public void onMessage(String chan, String sender, String login, String hostname, String msg){
+    public void onMessage(String chan, String sender, String login, String hostname, String msg) {
     	patternMatcher = triggerPattern.matcher(msg);
     	if (patternMatcher.find()) { // Respond to specific commands via "rblinks: command"
     		String trigger = patternMatcher.group(1);
@@ -37,46 +37,42 @@ public class RbLinkbot extends PircBot{
     		sendMessage(chan, response);
     	}
     	else { // Otherwise check for a URL in a string
-    		patternMatcher = urlPattern.matcher(msg);
+            patternMatcher = urlPattern.matcher(msg);
             if (patternMatcher.find() && !sender.equals("TinyURL")) {
-            	String beforeUrl = nullStringFix(patternMatcher.group(1));
-            	String url = patternMatcher.group(2).trim();
-            	String protocol = patternMatcher.group(3);
-            	String afterUrl = nullStringFix(patternMatcher.group(5));
+                String beforeUrl = nullStringFix(patternMatcher.group(1));
+                String url = patternMatcher.group(2).trim();
+                String protocol = patternMatcher.group(3);
+                String afterUrl = nullStringFix(patternMatcher.group(5));
                 
-            	try {
-            		System.out.println("Sender: " + sender + ", URL: " + url);
-            		addLink(url, sender);
-            	}
-            	catch(UnknownHostException e) {
-            		e.printStackTrace();
-            	}
+                System.out.println("Sender: " + sender + ", URL: " + url);
+                
+                try {
+                	addLink(url, sender);
+                }
+                catch(UnknownHostException e) {
+                	e.printStackTrace();
+                }
             }
     	}
     }
 
-    public BasicDBObject[] createLinkObj(String URL, String NICK, 
-                            String DATETIME, int COUNT){
-        BasicDBObject rblink = new BasicDBObject();
-        rblink.put("url", URL);
-        rblink.put("nick", NICK);
-        rblink.put("datetime", DATETIME);
-        rblink.put("count", COUNT);
-        final BasicDBObject[] links = {rblink};
-        return links;
-    }
-
-    private void addLink(String link, String nick) throws UnknownHostException{
+    private void addLink(String link, String nick) throws UnknownHostException {
         String time = new java.util.Date().toString();
         String url = "mongodb://XXXXXXXXXX";
+        
         MongoClientURI uri = new MongoClientURI(url);
         MongoClient client = new MongoClient(uri);
+        
         DB db = client.getDB(uri.getDatabase());
         DBCollection rblinks = db.getCollection("links");
+        BasicDBObject linkData = new BasicDBObject();
+        
+        linkData.append("url", link);
+        linkData.append("nick", nick);
+        linkData.append("datetime", time);
+        linkData.append("count", 1);
 
-        final BasicDBObject[] links = createLinkObj(link,nick,time,1);
-        rblinks.insert(links);
+        rblinks.insert(linkData, WriteConcern.NORMAL);
         client.close();
-    }
-     
+    }    
 }
