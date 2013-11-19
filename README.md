@@ -9,3 +9,4 @@ All your links are belong to us.
 Command Line Build
 ------------------
     javac -d bin -cp "lib\mongo-java-driver-2.11.2.jar;lib\pircbot.jar" src\com\redbrick\devchat\rblinks\RbLinkbot.java src\com\redbrick\devchat\rblinks\RbLinks.java
+    or simply ./run.sh to compile and run.
