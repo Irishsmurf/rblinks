@@ -12,7 +12,7 @@ public class RbLinkbot extends PircBot{
     private Matcher patternMatcher;
     
     public RbLinkbot() {
-        this.setName("rblinksdever");
+        this.setName("rblinks");
     }
     
     private static String nullStringFix(String input) {
