@@ -7,17 +7,17 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 public class RbLinkbot extends PircBot{
+    private static String urlRegex = "^(.+ )?(((ht|f)tps?://|www\\S+\\.)\\S+)( .+)?$";
+    private static Pattern urlPattern = Pattern.compile(urlRegex, Pattern.CASE_INSENSITIVE);
+    private Matcher patternMatcher;
+    
     public RbLinkbot() {
-        this.setName("rblinks");
+        this.setName("rblinksdever");
     }
     
-    public boolean containsReg(String mesg){
-        String REGEX = "^((https?|ftp)://|(www|ftp)\\.)?[a-z0-9-]+(\\.[a-z0-9-]+)+([/?].*)?$";
-        Pattern p = Pattern.compile(REGEX);
-        Matcher msg_m = p.matcher(mesg);
-        if(msg_m.find())    return true;
-        else    return false;
-    }
+    private static String nullStringFix(String input) {
+    	  return input == null ? "" : input;
+	}
 
     public void onMessage(String chan, String sender,
                        String login, String hostname, String msg){
@@ -28,19 +28,21 @@ public class RbLinkbot extends PircBot{
         if (msg.equalsIgnoreCase("rblinks: where")){
             sendMessage(chan, "https://api.mongolab.com/api/1/databases/redbricklinks/collections/links?apiKey=8sF5VRmL3C2NGv8rnoFJn_fz6UOaQuVj");
         }
-
-        if(containsReg(msg)){
-            String[] msgArr = msg.split(" ");
-            for(int i=0; i<msgArr.length; i++){
-                if((containsReg(msgArr[i])) && (!sender.equals("TinyURL"))){
-                    try{
-                        System.out.println("Sender: "+sender+" - " +msgArr[i]);
-                        addLink(msgArr[i].trim(), sender);
-                    }catch(UnknownHostException e){
-                        e.printStackTrace();
-                    }
-                }
-            }
+        
+        patternMatcher = urlPattern.matcher(msg);
+        if (patternMatcher.find() && !sender.equals("TinyURL")) {
+        	String beforeUrl = nullStringFix(patternMatcher.group(1));
+        	String url = patternMatcher.group(2).trim();
+        	String protocol = patternMatcher.group(3);
+        	String afterUrl = nullStringFix(patternMatcher.group(5));
+            
+        	try {
+        		System.out.println("Sender: " + sender + ", URL: " + url);
+        		addLink(url, sender);
+        	}
+        	catch(UnknownHostException e) {
+        		e.printStackTrace();
+        	}
         }
     }
 
