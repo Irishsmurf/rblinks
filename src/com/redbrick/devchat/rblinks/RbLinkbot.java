@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 public class RbLinkbot extends PircBot{
-    private static final String urlRegex = "^(.+ )?(((ht|f)tps?://|www\\S+\\.)([^/\\?&]+)(\\S+))( .+)?$";
+    private static final String urlRegex = "^(.+ )?(((ht|f)tps?://|www\\S+\\.)([^/\\?&]+)(\\S*))( .+)?$";
     private static final String triggerRegex = "^rblinks: (.+)$";
     private static final String dbURL = "https://api.mongolab.com/api/1/databases/redbricklinks/collections/links?apiKey=8sF5VRmL3C2NGv8rnoFJn_fz6UOaQuVj";
     private static final String version = Colors.RED + "Rb" + Colors.NORMAL + "Linkbot 1.1111111";
@@ -45,6 +45,8 @@ public class RbLinkbot extends PircBot{
                 String protocol = patternMatcher.group(3);
                 String domain = patternMatcher.group(5);
                 String path = nullStringFix(patternMatcher.group(6)).trim();
+                if (path.equals(""))
+                	path = "/";
                 String afterUrl = nullStringFix(patternMatcher.group(6)).trim();
                 
                 System.out.println("Sender: " + sender + ", URL: " + url + ", domain:" + domain + ", path: " + path);
