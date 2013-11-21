@@ -34,6 +34,15 @@ public class RbLinkbot extends PircBot{
     			response = version;
     		else if (trigger.equalsIgnoreCase("where"))
     			response = dbURL;
+    		else if (trigger.equalsIgnoreCase("remove TinyURL")) {
+    			try {
+    				removeTinyURLLinks();
+    			}
+    			catch (UnknownHostException e) {
+    				e.printStackTrace();
+    			}
+    		}
+    			
     		sendMessage(chan, response);
     	}
     	else { // Otherwise check for a URL in a string
@@ -88,6 +97,31 @@ public class RbLinkbot extends PircBot{
         }
     	
         rblinks.insert(linkData, WriteConcern.NORMAL);
+        client.close();
+    }
+    
+    private void removeTinyURLLinks() throws UnknownHostException {
+    	String url = "mongodb://XXXXXXXXXX";
+        MongoClientURI uri = new MongoClientURI(url);
+        MongoClient client = new MongoClient(uri);
+
+        DB db = client.getDB(uri.getDatabase());
+        DBCollection rblinks = db.getCollection("links");
+
+        BasicDBObject tinyURLLink = new BasicDBObject();
+        tinyURLLink.append("nick", "TinyURL");
+        
+        DBCursor tinyURLCursor = rblinks.find(tinyURLLink);
+        
+        System.out.println("Found " + tinyURLCursor.size() + " TinyURL links. Removing now.");
+        
+        DBObject temp;
+        
+        while (tinyURLCursor.hasNext()) {
+        	temp = tinyURLCursor.next();
+        	rblinks.remove(temp);
+        }
+        
         client.close();
     }
 }
