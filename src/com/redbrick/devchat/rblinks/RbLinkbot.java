@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 public class RbLinkbot extends PircBot{
-    private static final String urlRegex = "^(.+ )?(((ht|f)tps?://|www\\S+\\.)\\S+)( .+)?$";
+    private static final String urlRegex = "^(.+ )?(((ht|f)tps?://|www\\S+\\.)([^/\\?&]+)(\\S*))( .+)?$";
     private static final String triggerRegex = "^rblinks: (.+)$";
     private static final String dbURL = "https://api.mongolab.com/api/1/databases/redbricklinks/collections/links?apiKey=8sF5VRmL3C2NGv8rnoFJn_fz6UOaQuVj";
     private static final String version = Colors.RED + "Rb" + Colors.NORMAL + "Linkbot 1.1111111";
@@ -34,20 +34,25 @@ public class RbLinkbot extends PircBot{
     			response = version;
     		else if (trigger.equalsIgnoreCase("where"))
     			response = dbURL;
+    			
     		sendMessage(chan, response);
     	}
     	else { // Otherwise check for a URL in a string
             patternMatcher = urlPattern.matcher(msg);
             if (patternMatcher.find() && !sender.equals("TinyURL")) {
-                String beforeUrl = nullStringFix(patternMatcher.group(1));
+                String beforeUrl = nullStringFix(patternMatcher.group(1)).trim();
                 String url = patternMatcher.group(2).trim();
                 String protocol = patternMatcher.group(3);
-                String afterUrl = nullStringFix(patternMatcher.group(5));
+                String domain = patternMatcher.group(5);
+                String path = nullStringFix(patternMatcher.group(6)).trim();
+                if (path.equals(""))
+                	path = "/";
+                String afterUrl = nullStringFix(patternMatcher.group(6)).trim();
                 
-                System.out.println("Sender: " + sender + ", URL: " + url);
+                System.out.println("Sender: " + sender + ", URL: " + url + ", domain:" + domain + ", path: " + path);
                 
                 try {
-                	addLink(url, sender);
+                	addLink(protocol, domain, path, sender);
                 }
                 catch(UnknownHostException e) {
                 	e.printStackTrace();
@@ -56,7 +61,7 @@ public class RbLinkbot extends PircBot{
     	}
     }
 
-    private void addLink(String link, String nick) throws UnknownHostException {
+    private void addLink(String protocol, String domain, String path, String nick) throws UnknownHostException {
         String time = new java.util.Date().toString();
         String url = "mongodb://XXXXXXXXXX";
         
@@ -65,14 +70,30 @@ public class RbLinkbot extends PircBot{
         
         DB db = client.getDB(uri.getDatabase());
         DBCollection rblinks = db.getCollection("links");
-        BasicDBObject linkData = new BasicDBObject();
         
-        linkData.append("url", link);
-        linkData.append("nick", nick);
-        linkData.append("datetime", time);
-        linkData.append("count", 1);
+        BasicDBObject domainID = new BasicDBObject();
+        BasicDBObject linkData = new BasicDBObject();
 
+    	DBObject domainData = rblinks.findOne(domainID);
+    	domainID.append("domain", domain);
+        domainID.append("parent", null);
+    	
+        if (domainData == null) { // Domain not seen before
+        	System.out.println("New domain: " + domain + ". Adding to DB.");
+        	rblinks.insert(domainID, WriteConcern.NORMAL);
+        	domainData = rblinks.findOne(domainID);
+        }
+    	
+        Object parentID = domainData.get("_id");
+        
+        linkData.append("parent", parentID);
+    	linkData.append("protocol", protocol);
+    	linkData.append("path", path);
+    	linkData.append("nick", nick);
+    	linkData.append("datetime", time);
+    	linkData.append("count", 1);
+        
         rblinks.insert(linkData, WriteConcern.NORMAL);
         client.close();
-    }    
+    }
 }
