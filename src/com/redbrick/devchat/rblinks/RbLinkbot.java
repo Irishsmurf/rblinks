@@ -74,9 +74,9 @@ public class RbLinkbot extends PircBot{
         BasicDBObject domainID = new BasicDBObject();
         BasicDBObject linkData = new BasicDBObject();
 
-    	DBObject domainData = rblinks.findOne(domainID);
-    	domainID.append("domain", domain);
+        domainID.append("domain", domain);
         domainID.append("parent", null);
+        DBObject domainData = rblinks.findOne(domainID);
     	
         if (domainData == null) { // Domain not seen before
         	System.out.println("New domain: " + domain + ". Adding to DB.");
@@ -87,11 +87,11 @@ public class RbLinkbot extends PircBot{
         Object parentID = domainData.get("_id");
         
         linkData.append("parent", parentID);
-    	linkData.append("protocol", protocol);
-    	linkData.append("path", path);
-    	linkData.append("nick", nick);
-    	linkData.append("datetime", time);
-    	linkData.append("count", 1);
+        linkData.append("protocol", protocol);
+        linkData.append("path", path);
+        linkData.append("nick", nick);
+        linkData.append("datetime", time);
+        linkData.append("count", 1);
         
         rblinks.insert(linkData, WriteConcern.NORMAL);
         client.close();
