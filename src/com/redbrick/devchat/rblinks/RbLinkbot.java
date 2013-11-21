@@ -34,14 +34,6 @@ public class RbLinkbot extends PircBot{
     			response = version;
     		else if (trigger.equalsIgnoreCase("where"))
     			response = dbURL;
-    		else if (trigger.equalsIgnoreCase("remove TinyURL")) {
-    			try {
-    				removeTinyURLLinks();
-    			}
-    			catch (UnknownHostException e) {
-    				e.printStackTrace();
-    			}
-    		}
     			
     		sendMessage(chan, response);
     	}
@@ -58,7 +50,7 @@ public class RbLinkbot extends PircBot{
                 System.out.println("Sender: " + sender + ", URL: " + url + ", domain:" + domain + ", path: " + path);
                 
                 try {
-                	addLink(domain, path, sender);
+                	addLink(protocol, domain, path, sender);
                 }
                 catch(UnknownHostException e) {
                 	e.printStackTrace();
@@ -67,7 +59,7 @@ public class RbLinkbot extends PircBot{
     	}
     }
 
-    private void addLink(String domain, String path, String nick) throws UnknownHostException {
+    private void addLink(String protocol, String domain, String path, String nick) throws UnknownHostException {
         String time = new java.util.Date().toString();
         String url = "mongodb://XXXXXXXXXX";
         
@@ -79,49 +71,27 @@ public class RbLinkbot extends PircBot{
         
         BasicDBObject domainID = new BasicDBObject();
         BasicDBObject linkData = new BasicDBObject();
-        
-        domainID.append("_id", domain);
-        domainID.append("parent", null);
-
-    	linkData.append("parent", domain);
-    	linkData.append("path", path);
-    	linkData.append("nick", nick);
-    	linkData.append("datetime", time);
-    	linkData.append("count", 1);
 
     	DBObject domainData = rblinks.findOne(domainID);
+    	domainID.append("domain", domain);
+        domainID.append("parent", null);
     	
         if (domainData == null) { // Domain not seen before
         	System.out.println("New domain: " + domain + ". Adding to DB.");
         	rblinks.insert(domainID, WriteConcern.NORMAL);
+        	domainData = rblinks.findOne(domainID);
         }
     	
+        Object parentID = domainData.get("_id");
+        
+        linkData.append("parent", parentID);
+    	linkData.append("protocol", protocol);
+    	linkData.append("path", path);
+    	linkData.append("nick", nick);
+    	linkData.append("datetime", time);
+    	linkData.append("count", 1);
+        
         rblinks.insert(linkData, WriteConcern.NORMAL);
-        client.close();
-    }
-    
-    private void removeTinyURLLinks() throws UnknownHostException {
-    	String url = "mongodb://XXXXXXXXXX";
-        MongoClientURI uri = new MongoClientURI(url);
-        MongoClient client = new MongoClient(uri);
-
-        DB db = client.getDB(uri.getDatabase());
-        DBCollection rblinks = db.getCollection("links");
-
-        BasicDBObject tinyURLLink = new BasicDBObject();
-        tinyURLLink.append("nick", "TinyURL");
-        
-        DBCursor tinyURLCursor = rblinks.find(tinyURLLink);
-        
-        System.out.println("Found " + tinyURLCursor.size() + " TinyURL links. Removing now.");
-        
-        DBObject temp;
-        
-        while (tinyURLCursor.hasNext()) {
-        	temp = tinyURLCursor.next();
-        	rblinks.remove(temp);
-        }
-        
         client.close();
     }
 }
