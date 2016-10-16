@@ -20,3 +20,8 @@ maven_jar(
   name = 'pircbot',
   artifact = 'pircbot:pircbot:1.5.0'
 )
+
+maven_jar(
+  name = 'junit',
+  artifact = 'junit:junit:4.12'
+)

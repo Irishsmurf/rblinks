@@ -17,6 +17,9 @@ public class RbLinkbot extends PircBot{
 
     private Matcher patternMatcher;
 
+    public RbLinkbot(String name) {
+      this.setName(name);
+    }
     public RbLinkbot() {
         this.setName("rblinks");
     }
@@ -64,7 +67,7 @@ public class RbLinkbot extends PircBot{
 
     private void addLink(String protocol, String domain, String path, String nick) throws UnknownHostException {
         String time = new java.util.Date().toString();
-        String url = "mongodb://XXXXXXXXXX";
+        String url = "mongodb://user:password@ds057806.mlab.com:57806/rblinks";
 
         MongoClientURI uri = new MongoClientURI(url);
         MongoClient client = new MongoClient(uri);

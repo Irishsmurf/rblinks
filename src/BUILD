@@ -14,6 +14,7 @@ java_library(
   srcs = [
     'com/redbrick/devchat/rblinks/RbLinkbot.java',
   ],
+  visibility = ["//visibility:public"],
   deps = [
     '@pircbot//jar',
     '@org_mongodb_mongodb_driver//jar',
