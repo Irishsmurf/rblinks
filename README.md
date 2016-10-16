@@ -15,4 +15,8 @@ To compile:
 To run:
 
     ./bazel-bin/src/rblinks
-    
+
+
+Build Health
+---
+[![Build Status](https://travis-ci.org/DevChat/rblinks.svg?branch=bazel)](https://travis-ci.org/DevChat/rblinks)
