@@ -15,7 +15,10 @@ java_library(
     'com/redbrick/devchat/rblinks/RbLinkbot.java',
   ],
   deps = [
-    '//lib:pircbot',
-    '//lib:mongo-java'
+    '@pircbot//jar',
+    '@org_mongodb_mongodb_driver//jar',
+    '@org_mongodb_mongodb_java_driver//jar',
+    '@org_mongodb_mongodb_driver_async//jar',
+    '@org_mongodb_mongodb_driver_core//jar',
   ],
 )
