@@ -10,7 +10,7 @@ Command Line Build
 ------------------
 To compile:
 
-    bazel build src:rblinks
+    bazel build //src:rblinks
 
 To run:
 
