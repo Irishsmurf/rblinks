@@ -11,16 +11,19 @@ public class RbLinkbot extends PircBot{
     private static final String triggerRegex = "^rblinks: (.+)$";
     private static final String dbURL = "https://api.mongolab.com/api/1/databases/redbricklinks/collections/links?apiKey=8sF5VRmL3C2NGv8rnoFJn_fz6UOaQuVj";
     private static final String version = Colors.RED + "Rb" + Colors.NORMAL + "Linkbot 1.1111111";
-    
+
     private static final Pattern urlPattern = Pattern.compile(urlRegex, Pattern.CASE_INSENSITIVE);
     private static final Pattern triggerPattern = Pattern.compile(triggerRegex, Pattern.CASE_INSENSITIVE);
-    
+
     private Matcher patternMatcher;
-    
+
+    public RbLinkbot(String name) {
+      this.setName(name);
+    }
     public RbLinkbot() {
         this.setName("rblinks");
     }
-    
+
     private static String nullStringFix(String input) {
         return input == null ? "" : input;
     }
@@ -34,7 +37,8 @@ public class RbLinkbot extends PircBot{
     			response = version;
     		else if (trigger.equalsIgnoreCase("where"))
     			response = dbURL;
-    			
+        else if (trigger.equalsIgnoreCase("help"))
+          response = "Available Commands: where, version";
     		sendMessage(chan, response);
     	}
     	else { // Otherwise check for a URL in a string
@@ -48,9 +52,9 @@ public class RbLinkbot extends PircBot{
                 if (path.equals(""))
                 	path = "/";
                 String afterUrl = nullStringFix(patternMatcher.group(6)).trim();
-                
+
                 System.out.println("Sender: " + sender + ", URL: " + url + ", domain:" + domain + ", path: " + path);
-                
+
                 try {
                 	addLink(protocol, domain, path, sender);
                 }
@@ -63,36 +67,36 @@ public class RbLinkbot extends PircBot{
 
     private void addLink(String protocol, String domain, String path, String nick) throws UnknownHostException {
         String time = new java.util.Date().toString();
-        String url = "mongodb://XXXXXXXXXX";
-        
+        String url = "mongodb://user:password@ds057806.mlab.com:57806/rblinks";
+
         MongoClientURI uri = new MongoClientURI(url);
         MongoClient client = new MongoClient(uri);
-        
+
         DB db = client.getDB(uri.getDatabase());
         DBCollection rblinks = db.getCollection("links");
-        
+
         BasicDBObject domainID = new BasicDBObject();
         BasicDBObject linkData = new BasicDBObject();
 
         domainID.append("domain", domain);
         domainID.append("parent", null);
         DBObject domainData = rblinks.findOne(domainID);
-    	
+
         if (domainData == null) { // Domain not seen before
         	System.out.println("New domain: " + domain + ". Adding to DB.");
         	rblinks.insert(domainID, WriteConcern.NORMAL);
         	domainData = rblinks.findOne(domainID);
         }
-    	
+
         Object parentID = domainData.get("_id");
-        
+
         linkData.append("parent", parentID);
         linkData.append("protocol", protocol);
         linkData.append("path", path);
         linkData.append("nick", nick);
         linkData.append("datetime", time);
         linkData.append("count", 1);
-        
+
         rblinks.insert(linkData, WriteConcern.NORMAL);
         client.close();
     }
