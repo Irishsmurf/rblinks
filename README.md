@@ -1,8 +1,8 @@
 rblinks
 =======
 
-This is a simple IRC bot that stores links from redbricks #lobby
-All the data is publicly available for members to use via a read only Mongo DB.
+This is a simple IRC bot that stores links from an IRC Channel on a network.
+All the data is publicly available for members to use via a read only MongoDB.
 
 All your links are belong to us.
 
